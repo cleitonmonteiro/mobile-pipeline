@@ -26,7 +26,8 @@ const create = (req, res) => {
 };
 
 const findAll = async (req, res) => {
-  const orders = await Order.find({});
+  const orders = await Order.find(req.body);
+  console.log(req.body);
   console.log("Orders size: ", orders?.length);
   return res.json(orders);
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, FlatList, Button } from "react-native";
 
-const serverUrl = "http://192.168.0.7:3000/orders";
+const serverUrl = "http://192.168.0.3:3000/orders";
 
 export default function App() {
   const [orders, setOrders] = useState([]);
@@ -9,7 +9,16 @@ export default function App() {
 
   const fetchOrders = () => {
     setLoading(true);
-    fetch(serverUrl)
+    fetch(serverUrl, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        delivered: false,
+      }),
+    })
       .then((res) => res.json())
       .then((data) => {
         setOrders(data);
@@ -35,6 +44,8 @@ export default function App() {
       body: JSON.stringify({
         delivered: true,
       }),
+    }).then(() => {
+      fetchOrders();
     });
   };
 
@@ -67,11 +78,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    paddingVertical: 10,
+    margin: 16,
   },
   container: {
     flex: 1,
-    padding: 30,
     marginTop: 30,
     backgroundColor: "#fff",
     alignItems: "stretch",
@@ -84,6 +94,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     marginTop: 10,
+    marginHorizontal: 16,
     padding: 10,
   },
   deliveryBtn: {
