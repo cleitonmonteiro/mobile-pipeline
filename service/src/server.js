@@ -4,7 +4,7 @@ const cors = require("cors");
 
 const dbConfig = require("./db/config");
 const orderController = require("./controller/order.controller");
-const problemController = require("./controller/problem.controller");
+const subscriptionController = require("./controller/subscription.controller");
 const mocksController = require("./controller/mocks.controller");
 
 const app = express();
@@ -32,7 +32,7 @@ app.delete("/orders", orderController.deleteAll);
 app.post("/orders/new", orderController.create);
 app.put("/orders/:id", orderController.updateOne);
 
-app.post("/problems/new", problemController.create);
+app.post("/subscription/new", subscriptionController.create);
 
 app.post("/mocks", mocksController.create);
 app.delete("/mocks", mocksController.deleteAll);
@@ -41,4 +41,4 @@ app.listen(3000, () => {
   console.log("Server running at port 3000");
 });
 
-problemController.initConsumer();
+subscriptionController.initConsumer();

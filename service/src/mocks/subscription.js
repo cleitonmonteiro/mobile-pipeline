@@ -19,8 +19,22 @@ const data = [
   },
 ];
 
-function makeData(mobilesIds = []) {
-  return mobilesIds.map((id, index) => ({ ...data[index], mobileId: id }));
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function randomSelect(items = []) {
+  return items[getRandomInt(0, items.length - 1)];
+}
+
+function makeData(mobiles = [], users = []) {
+  return data.map((values) => ({
+    ...values,
+    mobileId: randomSelect(mobiles),
+    userId: randomSelect(users),
+  }));
 }
 
 module.exports = {

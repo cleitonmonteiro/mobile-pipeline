@@ -3,7 +3,13 @@ const mongoose = require("mongoose");
 const SubscriptionSchema = new mongoose.Schema(
   {
     mobileId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Mobile",
+      required: false,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: false,
     },
     track: {

@@ -1,60 +1,36 @@
+const User = require("../models/user.model");
 const Mobile = require("../models/mobile.model");
-const MobileSubscription = require("../models/subscription.model");
+const Subscription = require("../models/subscription.model");
 
+const userMocks = require("../mocks/users");
 const mobileMocks = require("../mocks/mobiles");
 const { makeData } = require("../mocks/subscription");
 
-const create = (req, res) => {
-  const result = {};
-
-  Mobile.insertMany(mobileMocks)
-    .then((mobileData) => {
-      console.log("Created mobiles mocks: ", mobileData);
-      result.mobile = mobileData;
-
-      MobileSubscription.insertMany(makeData(mobileData.map((m) => m._id)))
-        .then((subs) => {
-          console.log("Created subs mocks: ", subs);
-          result.subs = subs;
-          res.send(result);
-        })
-        .catch((err) => {
-          res.status(500).send({
-            message: err.message + "Some error occurred when try insert subs.",
-          });
-        });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message + "Some error occurred when try insert mobiles.",
-      });
-    });
+const create = async (req, res) => {
+  const mobiles = await Mobile.insertMany(mobileMocks);
+  const users = await User.insertMany(userMocks);
+  const subs = await Subscription.insertMany(
+    makeData(
+      mobiles.map((m) => m._id),
+      users.map((u) => u._id)
+    )
+  );
+  res.send({
+    mobiles,
+    users,
+    subs,
+  });
 };
 
-const deleteAll = (req, res) => {
-  Mobile.deleteMany({})
-    .then((mobiles) => {
-      MobileSubscription.deleteMany({})
-        .then((subs) => {
-          res.send({
-            message: `${
-              mobiles.deletedCount + subs.deletedCount
-            } all data deleted successfully!`,
-          });
-        })
-        .catch((err) => {
-          res.status(500).send({
-            message:
-              err.message || "Some error occurred while removing all orders.",
-          });
-        });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all orders.",
-      });
-    });
+const deleteAll = async (req, res) => {
+  const users = await User.deleteMany({});
+  const mobiles = await Mobile.deleteMany({});
+  const subs = await Subscription.deleteMany({});
+  res.send({
+    mobiles,
+    users,
+    subs,
+  });
 };
 
 module.exports = {
