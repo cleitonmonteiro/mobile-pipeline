@@ -5,6 +5,7 @@ const cors = require("cors");
 const dbConfig = require("./db/config");
 const mobileLocationUpdateController = require("./controller/mobileLocationUpdate.controller");
 const mocksController = require("./controller/mocks.controller");
+const authController = require("./controller/auth.controller");
 
 const app = express();
 app.use(cors());
@@ -30,6 +31,8 @@ app.post("/mobileLocationUpdate", mobileLocationUpdateController.create);
 
 app.post("/mocks", mocksController.create);
 app.delete("/mocks", mocksController.deleteAll);
+
+app.post("/login", authController.login);
 
 app.listen(3000, () => {
   console.log("Server running at port 3000");

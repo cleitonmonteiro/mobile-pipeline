@@ -1,12 +1,12 @@
 const data = [
   {
-    name: "Jim",
+    username: "jim",
   },
   {
-    name: "John",
+    username: "john",
   },
   {
-    name: "Jess",
+    username: "jess",
   },
 ];
 
