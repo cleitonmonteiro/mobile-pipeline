@@ -1,5 +1,4 @@
 const { v4 } = require("uuid");
-// const Mobile = require("../models/mobile.model");
 
 const { Kafka } = require("kafkajs");
 
@@ -27,14 +26,16 @@ async function initConsumer() {
 }
 
 const create = async (req, res) => {
-  // Validate request
-  const { latitude, longitude, provider, accuracy, mobileId } = req.body;
+  const { latitude, longitude, provider, accuracy, mobileId, timestamp } =
+    req.body;
+
   console.log("Sending data to Kafka: ", {
     latitude,
     longitude,
     provider,
     accuracy,
     mobileId,
+    timestamp,
   });
 
   await producer.connect();
@@ -48,12 +49,14 @@ const create = async (req, res) => {
           provider,
           accuracy,
           mobileId,
+          timestamp,
         }),
         key: v4(),
       },
     ],
   });
   await producer.disconnect();
+  res.status(201).send();
 };
 
 module.exports = {
