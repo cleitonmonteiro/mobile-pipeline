@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "445745315556",
+    "project_id": "mobile-pipeline-kafka",
+    "storage_bucket": "mobile-pipeline-kafka.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445745315556:android:9ef0fa88c03ca5805d36f1",
+        "android_client_info": {
+          "package_name": "io.github.cleitonmonteiro.demo_client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445745315556-qrn18ofcj64qkdkc721bjtpom3u2r0gj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGBd1OiBuhtXlo3aYx4qYVFgya1golidA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445745315556-qrn18ofcj64qkdkc721bjtpom3u2r0gj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
