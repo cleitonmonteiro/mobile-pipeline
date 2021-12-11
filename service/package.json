@@ -16,6 +16,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "firebase-admin": "^10.0.0",
     "kafkajs": "^1.15.0",
     "mongoose": "^6.0.12",
     "uuid": "^8.3.2"
