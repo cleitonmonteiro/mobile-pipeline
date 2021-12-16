@@ -1,29 +1,5 @@
 const { v4 } = require("uuid");
-
-const { Kafka } = require("kafkajs");
-
-const kafka = new Kafka({
-  clientId: "service-i1",
-  brokers: ["localhost:9092"],
-});
-
-const producer = kafka.producer();
-
-async function initConsumer() {
-  const consumer = kafka.consumer({ groupId: "location" });
-
-  await consumer.connect();
-  await consumer.subscribe({ topic: "mobile-location", fromBeginning: true });
-
-  await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      console.log({
-        fromConsumer: true,
-        message: { ...message, value: message.value.toString() },
-      });
-    },
-  });
-}
+const kafka = require("../helper/kafka");
 
 const create = async (req, res) => {
   const { latitude, longitude, provider, accuracy, mobileId, timestamp } =
@@ -38,6 +14,7 @@ const create = async (req, res) => {
     timestamp,
   });
 
+  const producer = kafka.producer();
   await producer.connect();
   await producer.send({
     topic: "mobile-location",
@@ -61,5 +38,4 @@ const create = async (req, res) => {
 
 module.exports = {
   create,
-  initConsumer,
 };

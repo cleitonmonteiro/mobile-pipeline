@@ -1,9 +1,4 @@
-const firebase = require("../config/firebase");
-
-const defaultOptions = {
-  priority: "high",
-  timeToLive: 60 * 60 * 24,
-};
+const firebaseHelper = require("../helper/firebase");
 
 const create = async (req, res) => {
   const { registrationToken, notification, data } = req.body;
@@ -13,11 +8,8 @@ const create = async (req, res) => {
       .send({ message: "Send the registrationToken and notification." });
   }
 
-  const message = data ? { notification, data } : { notification };
-
-  firebase.admin
-    .messaging()
-    .sendToDevice(registrationToken, message, defaultOptions)
+  firebaseHelper
+    .sendMessage(registrationToken, notification, data)
     .then((response) => {
       console.log(
         "🚀 ~ file: fcm.controller.js ~ line 22 ~ .then ~ response",

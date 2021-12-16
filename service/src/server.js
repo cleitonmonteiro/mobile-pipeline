@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const dbConfig = require("./db/config");
+const kafkaHelper = require("./helper/kafka");
+
 const mobileLocationUpdateController = require("./controller/mobileLocationUpdate.controller");
 const mocksController = require("./controller/mocks.controller");
 const authController = require("./controller/auth.controller");
@@ -41,4 +43,4 @@ app.listen(3000, () => {
   console.log("Server running at port 3000");
 });
 
-mobileLocationUpdateController.initConsumer();
+kafkaHelper.initConsumers();
