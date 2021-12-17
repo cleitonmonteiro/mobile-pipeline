@@ -8,17 +8,17 @@ const { makeData } = require("../mocks/subscription");
 
 const create = async (req, res) => {
   const mobiles = await Mobile.insertMany(mobileMocks);
-  const users = await User.insertMany(userMocks);
-  const subs = await Subscription.insertMany(
-    makeData(
-      mobiles.map((m) => m._id),
-      users.map((u) => u._id)
-    )
-  );
+  // const users = await User.insertMany(userMocks);
+  // const subs = await Subscription.insertMany(
+  //   makeData(
+  //     mobiles.map((m) => m._id),
+  //     users.map((u) => u._id)
+  //   )
+  // );
   res.send({
     mobiles,
-    users,
-    subs,
+    // users,
+    // subs,
   });
 };
 

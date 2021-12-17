@@ -2,7 +2,8 @@ const { Kafka } = require("kafkajs");
 
 const kafka = new Kafka({
   clientId: "service-i1",
-  brokers: ["172.17.0.5:9092"],
+  // TODO: change to get from env
+  brokers: ["172.17.0.4:9092"],
 });
 
 async function initConsumers() {

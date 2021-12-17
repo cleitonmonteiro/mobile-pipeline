@@ -9,6 +9,7 @@ const mobileLocationUpdateController = require("./controller/mobileLocationUpdat
 const mocksController = require("./controller/mocks.controller");
 const authController = require("./controller/auth.controller");
 const fcmController = require("./controller/fcm.controller");
+const mobileController = require("./controller/mobile.controller");
 
 const app = express();
 app.use(cors());
@@ -38,6 +39,8 @@ app.delete("/mocks", mocksController.deleteAll);
 app.post("/login", authController.login);
 
 app.post("/firebase/notification", fcmController.create);
+
+app.get("/mobiles", mobileController.getAll);
 
 app.listen(3000, () => {
   console.log("Server running at port 3000");
