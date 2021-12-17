@@ -36,6 +36,8 @@ dependencies:
   firebase_messaging: ^11.2.3
   firebase_core: ^1.10.5
   overlay_support: ^1.2.1
+  http: ^0.13.4
+  provider: ^6.0.1
 
 dev_dependencies:
   flutter_test:
