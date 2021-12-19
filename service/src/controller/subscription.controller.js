@@ -1,7 +1,7 @@
 const Subscrition = require("../models/subscription.model");
 
 const create = async (req, res) => {
-  const { mobileId, userId, track, distanceToNotifier, latitudde, longitude } =
+  const { mobileId, userId, track, distanceToNotifier, latitude, longitude } =
     req.body;
 
   if (!mobileId || !userId) {
@@ -15,7 +15,7 @@ const create = async (req, res) => {
     userId,
     track,
     distanceToNotifier,
-    latitudde,
+    latitude,
     longitude,
   });
 
@@ -25,7 +25,7 @@ const create = async (req, res) => {
       userId,
       track,
       distanceToNotifier,
-      latitudde,
+      latitude,
       longitude,
     });
     return res.status(201).send(sub);
