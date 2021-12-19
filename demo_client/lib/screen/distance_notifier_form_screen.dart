@@ -101,7 +101,7 @@ class _DistanceNotifierFormScreenState
                   label: Text('Distance (m)'),
                 ),
                 onChanged: (value) {
-                  distance = double.parse(value);
+                  distance = double.tryParse(value) ?? 0.0;
                 },
               ),
             ),
