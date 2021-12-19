@@ -5,12 +5,12 @@ const SubscriptionSchema = new mongoose.Schema(
     mobileId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Mobile",
-      required: false,
+      required: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: false,
+      required: true,
     },
     track: {
       type: Boolean,

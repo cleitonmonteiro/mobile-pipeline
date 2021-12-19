@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:demo_client/model/mobile.dart';
+import 'package:demo_client/model/subscription.dart';
 import 'package:demo_client/model/user.dart';
 import 'package:demo_client/utils/url.dart';
 import 'package:http/http.dart' as http;
@@ -33,5 +34,20 @@ class ApiService {
           l.map((model) => MobileModel.fromJson(model)));
     }
     return null;
+  }
+
+  Future<bool> sendSubscription(SubscriptionModel subscriptionModel) async {
+    var response = await http.post(
+      Uri.parse(Url.newSubscription),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(subscriptionModel.toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      return true;
+    }
+    return false;
   }
 }

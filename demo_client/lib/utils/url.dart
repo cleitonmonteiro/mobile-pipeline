@@ -3,4 +3,5 @@ class Url {
 
   static const login = '$baseUrl/login';
   static const mobiles = '$baseUrl/mobiles';
+  static const newSubscription = '$baseUrl/subscription';
 }

@@ -20,6 +20,7 @@ class _MobileFormScreenState extends State<MobileFormScreen> {
   bool loading = true;
 
   handleConfirm() async {
+    Provider.of<AppModel>(context, listen: false).setMobile(selectedMobile);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return const DistanceNotifierFormScreen();
     }));
