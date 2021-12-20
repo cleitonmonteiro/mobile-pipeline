@@ -1,5 +1,5 @@
 import 'package:demo_client/provider/app.dart';
-import 'package:demo_client/screen/home_screen.dart';
+import 'package:demo_client/screen/map_screen.dart';
 import 'package:demo_client/service/api.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -67,7 +67,7 @@ class _DistanceNotifierFormScreenState
 
       if (ok) {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return const HomePage();
+          return const MapScreen();
         }));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

@@ -2,23 +2,43 @@ import 'package:demo_client/model/push_notification.dart';
 import 'package:demo_client/widgets/notification_badge.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+final LatLngBounds sydneyBounds = LatLngBounds(
+  southwest: const LatLng(-34.022631, 150.620685),
+  northeast: const LatLng(-33.571835, 151.325952),
+);
+
+class MapScreen extends StatefulWidget {
+  const MapScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MapScreen> createState() => _MapScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MapScreenState extends State<MapScreen> {
   late final FirebaseMessaging _messaging;
   late int _totalNotifications;
   PushNotification? _notificationInfo;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  Map<CircleId, Circle> circles = <CircleId, Circle>{};
+
+  LatLng _markePosition = LatLng(-4.937579, -37.972346);
+
+  static const CameraPosition _kInitialPosition = CameraPosition(
+    target: LatLng(-4.939553, -37.972385),
+    zoom: 16.0,
+  );
+
+  CameraPosition _position = _kInitialPosition;
+  final bool _myLocationEnabled = true;
+  late GoogleMapController _controller;
 
   void registerNotification() async {
     _messaging = FirebaseMessaging.instance;
@@ -87,11 +107,48 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  _addMarkers() {
+    const MarkerId markerId = MarkerId('marker-id');
+
+    final Marker marker = Marker(
+        markerId: markerId,
+        position: _markePosition,
+        infoWindow: InfoWindow(title: "Mobile"),
+        onTap: () {});
+
+    setState(() {
+      markers[markerId] = marker;
+    });
+  }
+
+  _addCircles() {
+    const String circleIdVal = 'circle-id';
+    const CircleId circleId = CircleId(circleIdVal);
+
+    final Circle circle = Circle(
+      circleId: circleId,
+      consumeTapEvents: true,
+      strokeColor: Colors.red,
+      strokeWidth: 2,
+      center: _markePosition,
+      radius: 100,
+      onTap: () {
+        // _onCircleTapped(circleId);
+      },
+    );
+
+    setState(() {
+      circles[circleId] = circle;
+    });
+  }
+
   @override
   void initState() {
     _totalNotifications = 0;
     registerNotification();
     checkForInitialMessage();
+    _addMarkers();
+    _addCircles();
 
     // For handling notification when the app is in background
     // but not terminated
@@ -108,54 +165,38 @@ class _HomePageState extends State<HomePage> {
         _totalNotifications++;
       });
     });
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final GoogleMap googleMap = GoogleMap(
+      onMapCreated: onMapCreated,
+      initialCameraPosition: _kInitialPosition,
+      myLocationEnabled: _myLocationEnabled,
+      onCameraMove: _updateCameraPosition,
+      markers: Set<Marker>.of(markers.values),
+      circles: Set<Circle>.of(circles.values),
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Demo Client'),
+        title: const Text("Mobile on maps"),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'App for capturing Firebase Push Notifications',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          NotificationBadge(totalNotifications: _totalNotifications),
-          const SizedBox(height: 16.0),
-          _notificationInfo != null
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'TITLE: ${_notificationInfo!.dataTitle ?? _notificationInfo!.title}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      'BODY: ${_notificationInfo!.dataBody ?? _notificationInfo!.body}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                  ],
-                )
-              : Container(),
-        ],
-      ),
+      body: googleMap,
     );
+  }
+
+  void _updateCameraPosition(CameraPosition position) {
+    setState(() {
+      _position = position;
+    });
+  }
+
+  void onMapCreated(GoogleMapController controller) {
+    setState(() {
+      _controller = controller;
+      // _isMapCreated = true;
+    });
   }
 }
