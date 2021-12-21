@@ -7,15 +7,15 @@ const login = async (req, res) => {
       message: "The username/token cannot be empty.",
     });
   }
-  const user = await User.findOne({ username });
+  const user = await User.findOneAndUpdate({ username }, { token });
   if (user) {
-    console.log("User found!");
+    console.log("User found: ", user);
     return res.send(user);
   }
 
   const newUser = await User.create({ username, token });
   if (newUser) {
-    console.log("New user created!");
+    console.log("New user created: ", newUser);
     return res.status(201).send(newUser);
   }
   return res.status(400).send({
