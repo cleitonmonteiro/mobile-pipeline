@@ -120,6 +120,8 @@ class _MapScreenState extends State<MapScreen> {
   _addCircles() {
     const String circleIdVal = 'circle-id';
     const CircleId circleId = CircleId(circleIdVal);
+    final distanceToNotifier =
+        Provider.of<AppModel>(context, listen: false).distanceToNotifier;
 
     final Circle circle = Circle(
       circleId: circleId,
@@ -127,7 +129,7 @@ class _MapScreenState extends State<MapScreen> {
       strokeColor: Colors.red,
       strokeWidth: 2,
       center: _markePosition!,
-      radius: 100,
+      radius: distanceToNotifier,
       onTap: () {
         // _onCircleTapped(circleId);
       },
