@@ -8,7 +8,7 @@ const kafka = new Kafka({
 
 async function initConsumers() {
   console.log(
-    "🚀 ~ file: kafka.js ~ line 9 Starting kafka consumers fo topics [device-notifier]"
+    "🚀 ~ file: kafka.js ~ line 9 Starting kafka consumers fo topics [device-notifier, mobile-location]"
   );
   const notifierConsumer = kafka.consumer({ groupId: "notifier" });
   const locationConsumer = kafka.consumer({ groupId: "location" });
@@ -18,13 +18,11 @@ async function initConsumers() {
 
   await notifierConsumer.subscribe({
     topic: "device-notifier",
-    // topic: "mobile-location",
-    fromBeginning: true,
+    fromBeginning: false,
   });
   await locationConsumer.subscribe({
-    // topic: "device-notifier",
     topic: "mobile-location",
-    fromBeginning: true,
+    fromBeginning: false,
   });
 
   const callback = async ({ topic, partition, message }) => {
