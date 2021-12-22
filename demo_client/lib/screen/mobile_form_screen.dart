@@ -29,7 +29,9 @@ class _MobileFormScreenState extends State<MobileFormScreen> {
     loading = true;
     setState(() {});
     mobiles = await apiService.fetchMobiles() ?? [];
-    selectedMobile = mobiles.first;
+    if (mobiles.isNotEmpty) {
+      selectedMobile = mobiles.first;
+    }
     loading = false;
     setState(() {});
   }
@@ -47,8 +49,10 @@ class _MobileFormScreenState extends State<MobileFormScreen> {
         title: const Text("Select the mobile"),
       ),
       body: loading
-          ? const CircularProgressIndicator(
-              semanticsLabel: "Loading data",
+          ? const Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: "Loading data",
+              ),
             )
           : buildContent(),
       floatingActionButton: FloatingActionButton(

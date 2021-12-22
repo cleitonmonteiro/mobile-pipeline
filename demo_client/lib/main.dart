@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.deepPurple,
         ),
-        home: const LoginScreen(title: 'Demo Client'),
+        home: const LoginScreen(title: "Login"),
       ),
     );
   }

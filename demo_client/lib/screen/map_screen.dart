@@ -1,10 +1,11 @@
-import 'package:demo_client/model/push_notification.dart';
-import 'package:demo_client/widgets/notification_badge.dart';
+import 'dart:convert';
+
+import 'package:demo_client/model/push_notification_data.dart';
+import 'package:demo_client/provider/app.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:overlay_support/overlay_support.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:provider/provider.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
@@ -24,19 +25,11 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late final FirebaseMessaging _messaging;
-  late int _totalNotifications;
-  PushNotification? _notificationInfo;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Map<CircleId, Circle> circles = <CircleId, Circle>{};
 
-  LatLng _markePosition = LatLng(-4.937579, -37.972346);
+  LatLng? _markePosition;
 
-  static const CameraPosition _kInitialPosition = CameraPosition(
-    target: LatLng(-4.939553, -37.972385),
-    zoom: 16.0,
-  );
-
-  CameraPosition _position = _kInitialPosition;
   final bool _myLocationEnabled = true;
   late GoogleMapController _controller;
 
@@ -59,66 +52,69 @@ class _MapScreenState extends State<MapScreen> {
         print(
             'Message title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data}');
 
-        // Parse the message received
-        PushNotification notification = PushNotification(
-          title: message.notification?.title,
-          body: message.notification?.body,
-          dataTitle: message.data['title'],
-          dataBody: message.data['body'],
-        );
+        try {
+          PushNotificationData notification =
+              PushNotificationData.fromJson(jsonDecode(message.data['json']));
 
-        setState(() {
-          _notificationInfo = notification;
-          _totalNotifications++;
-        });
-
-        if (_notificationInfo != null) {
-          // For displaying the notification as an overlay
-          showSimpleNotification(
-            Text(_notificationInfo!.title!),
-            leading: NotificationBadge(totalNotifications: _totalNotifications),
-            subtitle: Text(_notificationInfo!.body!),
-            background: Colors.cyan.shade700,
-            duration: const Duration(seconds: 5),
-          );
+          _markePosition =
+              LatLng(notification.latitude, notification.longitude);
+          markers.clear();
+          circles.clear();
+          _addMarkers();
+          _addCircles();
+          setState(() {});
+        } catch (e) {
+          print(e);
         }
+
+        // if (_notificationInfo != null) {
+        //   // For displaying the notification as an overlay
+        //   showSimpleNotification(
+        //     Text(_notificationInfo!.title!),
+        //     leading: NotificationBadge(totalNotifications: _totalNotifications),
+        //     subtitle: Text(_notificationInfo!.body!),
+        //     background: Colors.cyan.shade700,
+        //     duration: const Duration(seconds: 5),
+        //   );
+        // }
       });
     } else {
       print('User declined or has not accepted permission');
     }
   }
 
-  checkForInitialMessage() async {
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
+  // checkForInitialMessage() async {
+  //   RemoteMessage? initialMessage =
+  //       await FirebaseMessaging.instance.getInitialMessage();
 
-    if (initialMessage != null) {
-      PushNotification notification = PushNotification(
-        title: initialMessage.notification?.title,
-        body: initialMessage.notification?.body,
-        dataTitle: initialMessage.data['title'],
-        dataBody: initialMessage.data['body'],
-      );
+  //   if (initialMessage != null) {
+  //     PushNotificationData notification = PushNotificationData(
+  //       title: initialMessage.notification?.title,
+  //       body: initialMessage.notification?.body,
+  //       dataTitle: initialMessage.data['title'],
+  //       dataBody: initialMessage.data['body'],
+  //     );
 
-      setState(() {
-        _notificationInfo = notification;
-        _totalNotifications++;
-      });
-    }
-  }
+  //     setState(() {
+  //       _notificationInfo = notification;
+  //       _totalNotifications++;
+  //     });
+  //   }
+  // }
 
   _addMarkers() {
-    const MarkerId markerId = MarkerId('marker-id');
+    const MarkerId markerId = MarkerId('mobile-marker');
+    final mobileDescription = Provider.of<AppModel>(context, listen: false)
+        .selectedMobile
+        ?.description;
 
     final Marker marker = Marker(
-        markerId: markerId,
-        position: _markePosition,
-        infoWindow: InfoWindow(title: "Mobile"),
-        onTap: () {});
-
-    setState(() {
-      markers[markerId] = marker;
-    });
+      markerId: markerId,
+      position: _markePosition!,
+      infoWindow: InfoWindow(title: mobileDescription),
+      onTap: () {},
+    );
+    markers[markerId] = marker;
   }
 
   _addCircles() {
@@ -130,51 +126,50 @@ class _MapScreenState extends State<MapScreen> {
       consumeTapEvents: true,
       strokeColor: Colors.red,
       strokeWidth: 2,
-      center: _markePosition,
+      center: _markePosition!,
       radius: 100,
       onTap: () {
         // _onCircleTapped(circleId);
       },
     );
-
-    setState(() {
-      circles[circleId] = circle;
-    });
+    circles[circleId] = circle;
   }
 
   @override
   void initState() {
-    _totalNotifications = 0;
     registerNotification();
-    checkForInitialMessage();
-    _addMarkers();
-    _addCircles();
+    // checkForInitialMessage();
 
-    // For handling notification when the app is in background
+    // TODO:
+    //For handling notification when the app is in background
     // but not terminated
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      PushNotification notification = PushNotification(
-        title: message.notification?.title,
-        body: message.notification?.body,
-        dataTitle: message.data['title'],
-        dataBody: message.data['body'],
-      );
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    //   PushNotificationData notification = PushNotificationData(
+    //     title: message.notification?.title,
+    //     body: message.notification?.body,
+    //     dataTitle: message.data['title'],
+    //     dataBody: message.data['body'],
+    //   );
 
-      setState(() {
-        _notificationInfo = notification;
-        _totalNotifications++;
-      });
-    });
+    //   setState(() {
+    //     _notificationInfo = notification;
+    //     _totalNotifications++;
+    //   });
+    // });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final position = Provider.of<AppModel>(context, listen: false).position;
     final GoogleMap googleMap = GoogleMap(
       onMapCreated: onMapCreated,
-      initialCameraPosition: _kInitialPosition,
+      initialCameraPosition: CameraPosition(
+        target: LatLng(position!.latitude, position.longitude),
+        zoom: 16,
+      ),
       myLocationEnabled: _myLocationEnabled,
-      onCameraMove: _updateCameraPosition,
+      // onCameraMove: _updateCameraPosition,
       markers: Set<Marker>.of(markers.values),
       circles: Set<Circle>.of(circles.values),
     );
@@ -187,11 +182,11 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _updateCameraPosition(CameraPosition position) {
-    setState(() {
-      _position = position;
-    });
-  }
+  // void _updateCameraPosition(CameraPosition position) {
+  //   setState(() {
+  //     _position = position;
+  //   });
+  // }
 
   void onMapCreated(GoogleMapController controller) {
     setState(() {
