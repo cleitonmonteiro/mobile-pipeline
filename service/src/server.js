@@ -41,6 +41,7 @@ app.post("/login", authController.login);
 
 app.post("/firebase/notification", fcmController.create);
 
+app.post("/mobiles", mobileController.create);
 app.get("/mobiles", mobileController.getAll);
 
 app.post("/subscription", subscriptionController.create);

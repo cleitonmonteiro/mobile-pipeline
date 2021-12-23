@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return OverlaySupport(
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Demo client',
         theme: ThemeData(
           primarySwatch: Colors.deepPurple,
         ),
