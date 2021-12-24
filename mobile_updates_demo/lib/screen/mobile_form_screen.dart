@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_updates_demo/screen/updates_screen.dart';
+import 'package:mobile_updates_demo/service/api.dart';
 
 class MobileForm extends StatefulWidget {
   const MobileForm({Key? key}) : super(key: key);
@@ -9,18 +10,28 @@ class MobileForm extends StatefulWidget {
 }
 
 class _MobileFormState extends State<MobileForm> {
+  final apiService = const ApiService();
   String? description;
 
+  _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+    ));
+  }
+
   handleConfirm() async {
-    final ok = true;
-    if (ok) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return UpdatesScreen(description: description!);
-      }));
+    if (description != null) {
+      final mobile = await apiService.createMobile(description!);
+
+      if (mobile != null) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return UpdatesScreen(mobile: mobile);
+        }));
+      } else {
+        _showMessage('Description cannot be empty');
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Cannot create a mobile.'),
-      ));
+      _showMessage('Description cannot be empty');
     }
   }
 

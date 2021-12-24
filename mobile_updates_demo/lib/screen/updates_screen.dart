@@ -2,17 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mobile_updates_demo/model/mobile.dart';
+import 'package:mobile_updates_demo/model/mobile_update.dart';
+import 'package:mobile_updates_demo/service/api.dart';
 
 class UpdatesScreen extends StatefulWidget {
-  const UpdatesScreen({Key? key, required this.description}) : super(key: key);
+  const UpdatesScreen({Key? key, required this.mobile}) : super(key: key);
 
-  final String description;
+  final MobileModel mobile;
 
   @override
   State<UpdatesScreen> createState() => _UpdatesScreenState();
 }
 
 class _UpdatesScreenState extends State<UpdatesScreen> {
+  final apiService = const ApiService();
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
 
   Position? _lastPosition;
@@ -43,12 +47,33 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
     return true;
   }
 
-  handlePositionUpdate(Position position) {
-    print("Location update: ${position.latitude} : ${position.longitude}");
-    setState(() {
-      _lastPosition = position;
-      _updateCount++;
-    });
+  _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+    ));
+  }
+
+  handlePositionUpdate(Position position) async {
+    if (position != null && _lastPosition != position) {
+      final update = MobileUpdateModel(
+        position.latitude,
+        position.longitude,
+        position.accuracy,
+        'GPS',
+        double.tryParse(position.timestamp.toString()) ?? 0,
+        widget.mobile.id,
+      );
+      final ok = await apiService.sendUpdate(update);
+      if (ok) {
+        print("Location update: ${position.latitude} : ${position.longitude}");
+        setState(() {
+          _lastPosition = position;
+          _updateCount++;
+        });
+      } else {
+        _showMessage('Cannot send location update.');
+      }
+    }
   }
 
   Future<Position?> _startingPositionUpdates() async {
@@ -91,7 +116,7 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.description),
+        title: Text(widget.mobile.description),
       ),
       body: Center(
         child: Column(
