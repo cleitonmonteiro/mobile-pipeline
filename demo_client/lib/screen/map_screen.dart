@@ -25,6 +25,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late final FirebaseMessaging _messaging;
+  late final AppModel _appProvider;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Map<CircleId, Circle> circles = <CircleId, Circle>{};
 
@@ -59,9 +60,7 @@ class _MapScreenState extends State<MapScreen> {
           _markePosition =
               LatLng(notification.latitude, notification.longitude);
           markers.clear();
-          circles.clear();
           _addMarkers();
-          _addCircles();
           setState(() {});
         } catch (e) {
           print(e);
@@ -83,30 +82,9 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  // checkForInitialMessage() async {
-  //   RemoteMessage? initialMessage =
-  //       await FirebaseMessaging.instance.getInitialMessage();
-
-  //   if (initialMessage != null) {
-  //     PushNotificationData notification = PushNotificationData(
-  //       title: initialMessage.notification?.title,
-  //       body: initialMessage.notification?.body,
-  //       dataTitle: initialMessage.data['title'],
-  //       dataBody: initialMessage.data['body'],
-  //     );
-
-  //     setState(() {
-  //       _notificationInfo = notification;
-  //       _totalNotifications++;
-  //     });
-  //   }
-  // }
-
   _addMarkers() {
     const MarkerId markerId = MarkerId('mobile-marker');
-    final mobileDescription = Provider.of<AppModel>(context, listen: false)
-        .selectedMobile
-        ?.description;
+    final mobileDescription = _appProvider.selectedMobile?.description;
 
     final Marker marker = Marker(
       markerId: markerId,
@@ -120,16 +98,15 @@ class _MapScreenState extends State<MapScreen> {
   _addCircles() {
     const String circleIdVal = 'circle-id';
     const CircleId circleId = CircleId(circleIdVal);
-    final distanceToNotifier =
-        Provider.of<AppModel>(context, listen: false).distanceToNotifier;
+    final position = _appProvider.position!;
 
     final Circle circle = Circle(
       circleId: circleId,
       consumeTapEvents: true,
       strokeColor: Colors.red,
       strokeWidth: 2,
-      center: _markePosition!,
-      radius: distanceToNotifier,
+      center: LatLng(position.latitude, position.longitude),
+      radius: _appProvider.distanceToNotifier,
       onTap: () {
         // _onCircleTapped(circleId);
       },
@@ -139,7 +116,9 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void initState() {
+    _appProvider = Provider.of<AppModel>(context, listen: false);
     registerNotification();
+    _addCircles();
     // checkForInitialMessage();
 
     // TODO:
@@ -163,7 +142,7 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final position = Provider.of<AppModel>(context, listen: false).position;
+    final position = _appProvider.position;
     final GoogleMap googleMap = GoogleMap(
       onMapCreated: onMapCreated,
       initialCameraPosition: CameraPosition(
@@ -178,17 +157,11 @@ class _MapScreenState extends State<MapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Mobile on maps"),
+        title: Text("${_appProvider.selectedMobile!.description} on maps"),
       ),
       body: googleMap,
     );
   }
-
-  // void _updateCameraPosition(CameraPosition position) {
-  //   setState(() {
-  //     _position = position;
-  //   });
-  // }
 
   void onMapCreated(GoogleMapController controller) {
     setState(() {
